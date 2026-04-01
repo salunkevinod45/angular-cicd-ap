@@ -3,40 +3,44 @@ name: CI pipeline
 on:
   push:
     branches: [main]
+
   pull_request:
+    branches: [main]
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '18'   # more stable than 22
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Install Chrome dependencies
-        run: sudo apt-get update && sudo apt-get install -y chromium-browser
-
-      - name: Install Cypress dependencies
+      - name: Install Cypress
         run: npx cypress install
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm run test
 
-      - name: Start angular app
-        run: npm start &
-
-      - name: Wait for app to start
-        run: npx wait-on http://localhost:4200
-
-      - name: Run end-to-end tests
-        run: npm run e2e
-
-      - name: Build angular app
+      - name: Build Angular app
         run: npm run build
 
-      - name: deploy to render
+      - name: Serve build
+        run: npx serve -l 3000 dist/angular-cicd-app/browser &
+
+      - name: Wait for app
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run E2E tests
+        run: CYPRESS_baseUrl=http://localhost:3000 npm run e2e
+
+      - name: Deploy to Render
         if: github.ref == 'refs/heads/main'
         run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}

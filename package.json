@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --watch=false --browsers=ChromeHeadless --no-sandbox",
+    "test": "ng test --watch=false --browsers=ChromeHeadless",
     "e2e": "cypress run"
   },
   "prettier": {
@@ -44,6 +44,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "serve": "^14.2.6",
     "typescript": "~5.9.2",
     "wait-on": "^9.0.4"
   }
